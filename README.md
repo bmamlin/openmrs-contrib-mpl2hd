@@ -1,7 +1,7 @@
 # Recipe for Converting to MPL 2.0 HD
 
 1. Edit pom.xml to add the license-maven-plugin
-        ```xml
+
         <plugin>
         	<groupId>com.mycila</groupId>
         	<artifactId>license-maven-plugin</artifactId>
@@ -43,16 +43,23 @@
         		</execution>
         	</executions>
         </plugin>
-        ```
+
 2. Add LICENSE (remove old license.txt)
 3. Add license-header.txt
 4. Add gitattributes as `.gitattributes`
 5. Convert line endings
+
         # may need to be repeated to process last entry
         $ scan-newlines | xargs dos2unix
+
 6. Scan for any other licenses
+
         $ scan-licenses
+
 7. Format licenses
+
         $ mvn license:format
+
 8. Check for any old licenses
+
         $ grep -R -e "OpenMRS Public" *
