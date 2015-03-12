@@ -1,6 +1,7 @@
 # Recipe for Converting to MPL 2.0 HD
 
 1. Edit pom.xml to add the license-maven-plugin
+        ```xml
         <plugin>
         	<groupId>com.mycila</groupId>
         	<artifactId>license-maven-plugin</artifactId>
@@ -42,6 +43,7 @@
         		</execution>
         	</executions>
         </plugin>
+        ```
 2. Add LICENSE (remove old license.txt)
 3. Add license-header.txt
 4. Add gitattributes as `.gitattributes`
