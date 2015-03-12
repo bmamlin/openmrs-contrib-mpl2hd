@@ -1,0 +1,54 @@
+#!/usr/bin/env groovy
+
+// Scan for non-OpenMRS licenses
+
+import groovy.io.FileType
+
+exclude = ['.git/', '/target/', '/dojo/', '/jquery/', '/jquery-ui/', '/puppet/']
+
+def binaries = ['.class','.db','.gif','.ico','.jar','.jpg','.omod','.png','.psd','.war','.zip']
+
+def ext = { f -> int i; (i = f.lastIndexOf('.')) > 0 ? f.substring(i) : "" }
+
+def nonOpenmrsLicense = { text ->
+  // Contains "copyright" but does not contain "OpenMRS, LLC"
+  (text.find(/(?i)copyright/) && !text.find(/(?i)openmrs, llc/))
+}
+
+def bogusLicense = { text ->
+  // Contains "copyright" but does not begin with comment
+  (text.find(/(i)copyright/) && text.find(/^(\/\*|\<!\-\-|#|\<%)/))
+}
+
+def list = []
+
+// Create list of all files (recursive) except .git folder
+def dir = new File(".")
+dir.eachFileRecurse (FileType.FILES) { file ->
+  def include = true
+  for (p in exclude) {
+    if (file.path.find(p)) {
+      include = false
+      break
+    }
+  }
+  if (include)
+	  list << file
+}
+
+// Scan all files for non-OpenMRS licenses or bogus licenses
+def nonOpenMRSLicenseExists = false
+def bogusLicenseExists = false
+list.each {
+  if (!binaries.contains(ext(it.path))) {
+    def text = it.text
+  	if (nonOpenmrsLicense(text)) {
+		  println it.path
+      nonOpenMRSLicenseExists = true
+    } else if (bogusLicense(text)) {
+      println it.path
+      bogusLicenseExists = true
+    }
+  }
+}
+System.exit(nonOpenMRSLicenseExists || bogusLicenseExists ? 1 : 0)

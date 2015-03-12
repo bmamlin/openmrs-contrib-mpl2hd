@@ -1,0 +1,40 @@
+#!/usr/bin/env groovy
+
+// Scan line endings
+
+import groovy.io.FileType
+
+exclude = ['.git/', '/target/']
+
+def binaries = ['.class','.db','.gif','.ico','.jar','.jpg','.omod','.png','.psd','.war','.zip']
+
+def ext = { f -> int i; (i = f.lastIndexOf('.')) > 0 ? f.substring(i) : "" }
+
+def windowsNewlines = { file ->
+  def text = file.text
+  text.find(/\r\n/)
+}
+
+def list = []
+
+// Create list of all files (recursive) except .git folder
+def dir = new File(".")
+dir.eachFileRecurse (FileType.FILES) { file ->
+  def include = true
+  for (p in exclude) {
+    if (file.path.find(p)) {
+      include = false
+      break
+    }
+  }
+  if (include)
+	  list << file
+}
+
+// Scan all files for Windows newlines
+list.each {
+  if (!binaries.contains(ext(it.path))) {
+  	if (windowsNewlines(it))
+		println it.path
+  }
+}
